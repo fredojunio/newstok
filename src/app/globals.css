@@ -1,0 +1,72 @@
+@import "tailwindcss";
+
+@theme inline {
+  --color-primary-orange: #FF4F00;
+  --color-bright-blue: #0057FF;
+  --color-fresh-green: #1FD655;
+  --color-honey-yellow: #FFC300;
+  --color-cream-bg: #FDFBF7;
+  --color-dark-text: #1E1E1E;
+  --font-sans: var(--font-outfit), Arial, Helvetica, sans-serif;
+  
+  --animate-fade-in-down: fade-in-down 0.5s ease-out;
+  --animate-fade-in-up: fade-in-up 0.5s ease-out;
+}
+
+:root {
+  --background: #FDFBF7;
+  --foreground: #1E1E1E;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+}
+
+@keyframes fade-in-down {
+  0% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-up {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.brutal-shadow {
+  box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+  border: 2px solid #000;
+}
+
+.brutal-shadow-orange {
+  box-shadow: 4px 4px 0px #FF4F00;
+  border: 2px solid #000;
+}
+
+.brutal-shadow-blue {
+  box-shadow: 4px 4px 0px #0057FF;
+  border: 2px solid #000;
+}
+
+/* Micro animations */
+.hover-lift {
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease-out;
+}
+.hover-lift:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+}
