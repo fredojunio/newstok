@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Bot, Link, CheckCircle2, RotateCcw, AlertTriangle, ChevronRight, Loader2 } from 'lucide-react';
+import { Bot, Link, CheckCircle2, RotateCcw, AlertTriangle, ChevronRight, Loader2, Video } from 'lucide-react';
 import { saveGeneratedContent } from './actions';
 
 export default function Home() {
@@ -10,6 +10,7 @@ export default function Home() {
   const [results, setResults] = useState<any>(null);
   const [error, setError] = useState('');
   const [savedStyle, setSavedStyle] = useState<string | null>(null);
+  const [youtubeUrl, setYoutubeUrl] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,14 +35,47 @@ export default function Home() {
 
       setLoadingStep(2);
       // 2. Generate
-      const genRes = await fetch('/api/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: scrapeData.content, modelUsed: model })
-      });
-      const genData = await genRes.json();
+      let genData: any;
+      
+      if (model === 'puter') {
+        const { puter } = await import('@heyputer/puter.js');
+        const prompt = `You are an expert copywriter fluent in Indonesian. Read the following news content and generate 3 different versions (storytelling, data-driven, and inspiratif) following the Hook, Bridge, Value, CTA structure. 
 
-      if (!genRes.ok) throw new Error(genData.error || 'Failed to generate content');
+ALL output MUST be in Indonesian language using a casual and engaging accent (bahasa santai/gaul) that is friendly and relatable. Use popular Indonesian slang or informal terms where appropriate to make it feel authentic, but keep it readable.
+
+Pastikan juga untuk menyisipkan penjelasan sederhana mengenai konsep AI atau teknologi terkini yang ada di dalam berita. Jelaskan dengan perumpamaan yang sangat mudah dimengerti oleh orang awam (biasa/non-teknis) agar mereka bisa sekaligus teredukasi mengenai perkembangan teknologi terbaru.
+
+Make each section impactful and highly engaging.
+
+Return ONLY a valid JSON object matching this schema exactly (no markdown formatting, no comments, just raw JSON):
+{
+  "storytelling": { "hook": "...", "bridge": "...", "value": "...", "cta": "..." },
+  "dataDriven": { "hook": "...", "bridge": "...", "value": "...", "cta": "..." },
+  "inspiratif": { "hook": "...", "bridge": "...", "value": "...", "cta": "..." }
+}
+
+News Content:
+${scrapeData.content.substring(0, 15000)}`;
+
+        const response: any = await puter.ai.chat(prompt, { model: 'gpt-4o' });
+        let responseText = typeof response === 'string' ? response : (response?.message?.content || response?.text || JSON.stringify(response));
+
+        if (!responseText) throw new Error("Received empty response from Puter AI");
+
+        const jsonMatch = responseText.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) throw new Error("Could not parse AI output as JSON");
+
+        genData = JSON.parse(jsonMatch[0]);
+      } else {
+        const genRes = await fetch('/api/generate', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ content: scrapeData.content, modelUsed: model })
+        });
+        genData = await genRes.json();
+
+        if (!genRes.ok) throw new Error(genData.error || 'Failed to generate content');
+      }
 
       setResults(genData);
     } catch (err: any) {
@@ -61,6 +95,7 @@ export default function Home() {
       value: styleData.value,
       cta: styleData.cta,
       style: styleKey,
+      youtubeUrl: youtubeUrl || undefined,
     });
 
     if (res.success) {
@@ -100,6 +135,19 @@ export default function Home() {
               />
             </div>
 
+            <div className="flex bg-cream-bg rounded-xl brutal-shadow overflow-hidden group focus-within:ring-4 ring-primary-orange/20 transition-all">
+              <span className="p-4 flex items-center justify-center bg-cream-bg border-r-2 border-black">
+                <Video className="h-6 w-6 text-[#FF0000] opacity-80" />
+              </span>
+              <input
+                type="url"
+                placeholder="Optional: YouTube video source URL..."
+                className="flex-1 bg-transparent p-4 outline-none font-bold text-lg"
+                value={youtubeUrl}
+                onChange={(e) => setYoutubeUrl(e.target.value)}
+              />
+            </div>
+
             <div className="flex flex-col sm:flex-row gap-4 items-center">
               <div className="flex-1 w-full bg-cream-bg rounded-xl brutal-shadow overflow-hidden flex focus-within:ring-4 ring-bright-blue/20 transition-all">
                 <span className="p-4 flex items-center justify-center bg-cream-bg border-r-2 border-black">
@@ -113,6 +161,8 @@ export default function Home() {
                   <option value="openai">OpenAI</option>
                   <option value="gemini">Google Gemini</option>
                   <option value="claude">Claude</option>
+                  <option value="deepseek">DeepSeek</option>
+                  <option value="puter">Puter (Free)</option>
                 </select>
               </div>
 

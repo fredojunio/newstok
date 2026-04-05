@@ -14,6 +14,7 @@ export async function saveGeneratedContent(data: {
   value: string;
   cta: string;
   style: string;
+  youtubeUrl?: string;
 }) {
   try {
     if (!db) {
@@ -31,6 +32,7 @@ export async function saveGeneratedContent(data: {
       cta: data.cta,
       fullContent,
       style: data.style,
+      youtubeUrl: data.youtubeUrl,
     });
     
     revalidatePath('/history');

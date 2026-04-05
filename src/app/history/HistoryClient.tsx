@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { Trash2, Edit3, Download, Eye, X, Save, AlertTriangle } from 'lucide-react';
+import { Trash2, Edit3, Download, Eye, X, Save, AlertTriangle, Video } from 'lucide-react';
 import { deleteGeneratedContent, editGeneratedContent } from '../actions';
 
 type HistoryItem = {
@@ -12,6 +12,7 @@ type HistoryItem = {
   bridge: string | null;
   value: string | null;
   cta: string | null;
+  youtubeUrl: string | null;
   fullContent: string | null;
   createdAt: string | null;
 };
@@ -191,6 +192,16 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
                     <p className="text-xs font-black uppercase opacity-60 mb-1">Source URL</p>
                     <a href={selectedItem.url} target="_blank" rel="noreferrer" className="text-bright-blue font-bold break-all hover:underline">{selectedItem.url}</a>
                   </div>
+
+                  {selectedItem.youtubeUrl && (
+                    <div className="mt-4 bg-[#FF0000]/5 p-4 rounded-xl border border-[#FF0000]/10 flex items-center gap-3">
+                      <Video className="h-5 w-5 text-[#FF0000]" />
+                      <div className="flex-1">
+                        <p className="text-[10px] font-black uppercase text-[#FF0000] opacity-60 mb-0.5">Video Source</p>
+                        <a href={selectedItem.youtubeUrl} target="_blank" rel="noreferrer" className="text-[#FF0000] font-bold break-all hover:underline text-sm">{selectedItem.youtubeUrl}</a>
+                      </div>
+                    </div>
+                  )}
                </div>
 
               <div className="p-6 bg-white border-t-4 border-black flex justify-end gap-4">

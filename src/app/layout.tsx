@@ -10,6 +10,9 @@ const outfit = Outfit({
 export const metadata: Metadata = {
   title: "Newstok | AI Content Generator",
   description: "Generate highly engaging content variants from any news article using AI.",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({
@@ -30,9 +33,12 @@ export default function RootLayout({
         
         {/* Header Navigation */}
         <header className="p-6 max-w-7xl w-full mx-auto animate-fade-in-down flex items-center justify-between">
-            <h1 className="text-3xl font-extrabold tracking-tight text-primary-orange brutal-shadow bg-white px-4 py-1 rounded-2xl inline-block -rotate-2 transform hover:rotate-0 transition-transform cursor-pointer">
-                Newstok.
-            </h1>
+            <div className="flex items-center gap-3 brutal-shadow bg-white px-4 py-2 rounded-2xl -rotate-2 transform hover:rotate-0 transition-transform cursor-pointer border-2 border-black">
+                <img src="/logo.png" alt="Newstok Logo" className="h-8 w-8" />
+                <h1 className="text-3xl font-extrabold tracking-tight text-primary-orange">
+                    Newstok.
+                </h1>
+            </div>
             <nav className="flex gap-4">
                 <a href="/" className="px-4 py-2 font-bold rounded-xl hover:bg-black/5 transition-colors">Home</a>
                 <a href="/history" className="px-4 py-2 font-bold bg-dark-text text-white rounded-xl brutal-shadow hover-lift block">History</a>

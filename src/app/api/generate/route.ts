@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { generateObject } from 'ai';
-import { openai } from '@ai-sdk/openai';
+import { openai, createOpenAI } from '@ai-sdk/openai';
 import { google } from '@ai-sdk/google';
 import { anthropic } from '@ai-sdk/anthropic';
 import { z } from 'zod';
@@ -43,6 +43,15 @@ export async function POST(request: Request) {
       selectedModel = google('gemini-2.5-flash-lite');
     } else if (modelUsed === 'claude') {
       selectedModel = anthropic('claude-3-5-sonnet-latest'); // Ensure the standard anthropic model string
+    } else if (modelUsed === 'deepseek') {
+      const deepseek = createOpenAI({
+        name: 'deepseek',
+        apiKey: process.env.DEEPSEEK_API_KEY,
+        baseURL: 'https://api.deepseek.com',
+      });
+      selectedModel = deepseek('deepseek-chat');
+    } else if (modelUsed === 'puter') {
+       return NextResponse.json({ error: 'Puter generation must be handled on the client side' }, { status: 400 });
     } else {
       return NextResponse.json({ error: 'Invalid model chosen' }, { status: 400 });
     }
@@ -53,6 +62,8 @@ export async function POST(request: Request) {
       prompt: `You are an expert copywriter fluent in Indonesian. Read the following news content and generate 3 different versions (storytelling, data-driven, and inspiratif) following the Hook, Bridge, Value, CTA structure. 
 
 ALL output MUST be in Indonesian language using a casual and engaging accent (bahasa santai/gaul) that is friendly and relatable. Use popular Indonesian slang or informal terms where appropriate to make it feel authentic, but keep it readable.
+
+Pastikan juga untuk menyisipkan penjelasan sederhana mengenai konsep AI atau teknologi terkini yang ada di dalam berita. Jelaskan dengan perumpamaan yang sangat mudah dimengerti oleh orang awam (biasa/non-teknis) agar mereka bisa sekaligus teredukasi mengenai perkembangan teknologi terbaru.
 
 Make each section impactful and highly engaging.
 
