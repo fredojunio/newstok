@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import { Readability } from '@mozilla/readability';
-import { JSDOM } from 'jsdom';
 import * as cheerio from 'cheerio';
 
 export async function POST(request: Request) {
@@ -22,23 +20,34 @@ export async function POST(request: Request) {
     }
 
     const html = await response.text();
+    const $ = cheerio.load(html);
 
-    // Use JSDOM and Readability safely
-    const doc = new JSDOM(html, { url });
-    const reader = new Readability(doc.window.document);
-    const article = reader.parse();
+    // Remove non-content elements
+    $('script, style, noscript, iframe, nav, footer, header, ads, aside').remove();
 
-    let content = article?.textContent || '';
+    const title = $('title').text() || $('h1').first().text();
 
-    // If Readability fails or doesn't find much, fallback to basic cheerio usage
-    if (!content.trim() || content.length < 200) {
-      const $ = cheerio.load(html);
-      $('script, style, noscript, iframe, nav, footer, header').remove();
+    // Strategy: Target common article tags or the main body content
+    let content = '';
+    const mainContent = $('article, main, .post-content, .article-content, #article-body, .entry-content');
+
+    if (mainContent.length > 0) {
+      content = mainContent.text();
+    } else {
+      // Fallback: Just grab all paragraphs if No obvious container
+      content = $('p').map((_, el) => $(el).text()).get().join(' ');
+    }
+
+    // Comprehensive clean up
+    content = content.replace(/\s+/g, ' ').trim();
+
+    // If still too short, just grab the body text
+    if (content.length < 200) {
       content = $('body').text().replace(/\s+/g, ' ').trim();
     }
 
     return NextResponse.json({
-      title: article?.title || '',
+      title: title || '',
       content: content,
     });
   } catch (error: any) {
