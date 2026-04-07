@@ -12,6 +12,7 @@ export const generatedContents = pgTable("generated_contents", {
   fullContent: text("full_content"),
   style: text("style"),
   youtubeUrl: text("youtube_url"),
+  title: text("title").default(""),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
   updatedAt: timestamp("updated_at", { withTimezone: true }),
 });

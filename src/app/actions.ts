@@ -14,6 +14,7 @@ export async function saveGeneratedContent(data: {
   value: string;
   cta: string;
   style: string;
+  title?: string;
   youtubeUrl?: string;
 }) {
   try {
@@ -32,7 +33,8 @@ export async function saveGeneratedContent(data: {
       cta: data.cta,
       fullContent,
       style: data.style,
-      youtubeUrl: data.youtubeUrl,
+      title: data.title ?? "",
+      youtubeUrl: data.youtubeUrl ?? null,
     });
     
     revalidatePath('/history');
@@ -55,11 +57,25 @@ export async function deleteGeneratedContent(id: string) {
   }
 }
 
-export async function editGeneratedContent(id: string, newContent: string) {
+export async function editGeneratedContent(id: string, data: {
+  hook: string;
+  bridge: string;
+  value: string;
+  cta: string;
+}) {
   try {
     if (!db) return { success: false, error: 'DB not initialized.' };
+    const fullContent = `${data.hook}\n\n${data.bridge}\n\n${data.value}\n\n${data.cta}`;
+    
     await db.update(generatedContents)
-      .set({ fullContent: newContent, updatedAt: new Date() })
+      .set({ 
+        hook: data.hook,
+        bridge: data.bridge,
+        value: data.value,
+        cta: data.cta,
+        fullContent, 
+        updatedAt: new Date() 
+      })
       .where(eq(generatedContents.id, id));
     revalidatePath('/history');
     return { success: true };

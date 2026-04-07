@@ -13,6 +13,7 @@ type HistoryItem = {
   value: string | null;
   cta: string | null;
   youtubeUrl: string | null;
+  title: string | null;
   fullContent: string | null;
   createdAt: string | null;
 };
@@ -22,6 +23,10 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
   const [selectedItem, setSelectedItem] = useState<HistoryItem | null>(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState('');
+  const [editHook, setEditHook] = useState('');
+  const [editBridge, setEditBridge] = useState('');
+  const [editValue, setEditValue] = useState('');
+  const [editCTA, setEditCTA] = useState('');
   const [loadingAction, setLoadingAction] = useState<string | null>(null);
 
   const handleDelete = async (id: string, e?: React.MouseEvent) => {
@@ -54,11 +59,32 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
   const handleSaveEdit = async () => {
     if (!selectedItem) return;
     setLoadingAction('edit');
-    const res = await editGeneratedContent(selectedItem.id, editContent);
+    const editData = {
+      hook: editHook,
+      bridge: editBridge,
+      value: editValue,
+      cta: editCTA,
+    };
+    const res = await editGeneratedContent(selectedItem.id, editData);
     if (res.success) {
-      const updated = items.map(i => i.id === selectedItem.id ? { ...i, fullContent: editContent } : i);
+      const fullContent = `${editHook}\n\n${editBridge}\n\n${editValue}\n\n${editCTA}`;
+      const updated = items.map(i => i.id === selectedItem.id ? { 
+        ...i, 
+        hook: editHook,
+        bridge: editBridge,
+        value: editValue,
+        cta: editCTA,
+        fullContent 
+      } : i);
       setItems(updated);
-      setSelectedItem({ ...selectedItem, fullContent: editContent });
+      setSelectedItem({ 
+        ...selectedItem, 
+        hook: editHook,
+        bridge: editBridge,
+        value: editValue,
+        cta: editCTA,
+        fullContent 
+      });
       setIsEditing(false);
     } else {
       alert(res.error);
@@ -99,8 +125,9 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
              </div>
              
              <div className="flex-1 overflow-hidden relative mb-4">
-                <p className="text-sm font-medium leading-relaxed opacity-80 whitespace-pre-wrap">{item.fullContent}</p>
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-linear-to-t from-white to-transparent flex items-end justify-start px-2 pb-1 gap-1">
+                <h3 className="text-lg font-black leading-tight mb-2 line-clamp-2">{item.title || "Untitled Post"}</h3>
+                <p className="text-sm font-medium leading-relaxed opacity-70 whitespace-pre-wrap line-clamp-4">{item.fullContent}</p>
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent flex items-end justify-start px-2 pb-1 gap-1">
                    <div className="h-1.5 w-4 rounded-full bg-primary-orange/50" title="Hook"></div>
                    <div className="h-1.5 w-4 rounded-full bg-bright-blue/50" title="Bridge"></div>
                    <div className="h-1.5 w-4 rounded-full bg-fresh-green/50" title="Value"></div>
@@ -151,12 +178,40 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
                <div className="p-6 overflow-y-auto flex-1 bg-white/50">
                   
                   {isEditing ? (
-                     <textarea 
-                       className="w-full h-full min-h-[400px] bg-white p-4 font-medium text-lg leading-relaxed outline-none border-4 border-black/10 focus:border-primary-orange rounded-xl resize-none brutal-shadow transition-colors"
-                       value={editContent}
-                       onChange={(e) => setEditContent(e.target.value)}
-                       placeholder="Edit the full content here..."
-                     />
+                     <div className="flex flex-col gap-4 min-h-[400px]">
+                        <div>
+                          <span className="text-[10px] font-black uppercase opacity-40 mb-1 block">Hook</span>
+                          <textarea 
+                            className="w-full h-24 bg-white p-3 font-bold text-base leading-snug outline-none border-2 border-black/10 focus:border-primary-orange rounded-xl resize-none brutal-shadow transition-colors"
+                            value={editHook}
+                            onChange={(e) => setEditHook(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-black uppercase opacity-40 mb-1 block">Bridge</span>
+                          <textarea 
+                            className="w-full h-24 bg-white p-3 font-medium text-base leading-snug outline-none border-2 border-black/10 focus:border-bright-blue rounded-xl resize-none brutal-shadow transition-colors"
+                            value={editBridge}
+                            onChange={(e) => setEditBridge(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-black uppercase opacity-40 mb-1 block">Value</span>
+                          <textarea 
+                            className="w-full h-24 bg-white p-3 font-medium text-base leading-snug outline-none border-2 border-black/10 focus:border-fresh-green rounded-xl resize-none brutal-shadow transition-colors"
+                            value={editValue}
+                            onChange={(e) => setEditValue(e.target.value)}
+                          />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-black uppercase opacity-40 mb-1 block">CTA</span>
+                          <textarea 
+                            className="w-full h-24 bg-white p-3 font-bold text-base leading-snug outline-none border-2 border-black/10 focus:border-honey-yellow rounded-xl resize-none brutal-shadow transition-colors"
+                            value={editCTA}
+                            onChange={(e) => setEditCTA(e.target.value)}
+                          />
+                        </div>
+                     </div>
                   ) : (
                     <div className="flex flex-col gap-6">
                        <div className="bg-white p-4 rounded-2xl brutal-shadow border-2 border-black/5">
@@ -229,12 +284,18 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
                      >
                        <Download className="h-5 w-5" /> Export TXT
                      </button>
-                     <button 
-                       onClick={() => { setIsEditing(true); setEditContent(selectedItem.fullContent || ''); }}
-                       className="px-6 py-3 font-black bg-bright-blue text-white hover-lift brutal-shadow rounded-xl flex items-center gap-2"
-                     >
-                       <Edit3 className="h-5 w-5" /> Edit Text
-                     </button>
+                      <button 
+                        onClick={() => { 
+                          setIsEditing(true); 
+                          setEditHook(selectedItem.hook || '');
+                          setEditBridge(selectedItem.bridge || '');
+                          setEditValue(selectedItem.value || '');
+                          setEditCTA(selectedItem.cta || '');
+                        }}
+                        className="px-6 py-3 font-black bg-bright-blue text-white hover-lift brutal-shadow rounded-xl flex items-center gap-2"
+                      >
+                        <Edit3 className="h-5 w-5" /> Edit Text
+                      </button>
                    </>
                  )}
               </div>
