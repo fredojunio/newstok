@@ -127,7 +127,7 @@ export default function HistoryClient({ items: initialItems }: { items: HistoryI
              <div className="flex-1 overflow-hidden relative mb-4">
                 <h3 className="text-lg font-black leading-tight mb-2 line-clamp-2">{item.title || "Untitled Post"}</h3>
                 <p className="text-sm font-medium leading-relaxed opacity-70 whitespace-pre-wrap line-clamp-4">{item.fullContent}</p>
-                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-white to-transparent flex items-end justify-start px-2 pb-1 gap-1">
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-linear-to-t from-white to-transparent flex items-end justify-start px-2 pb-1 gap-1">
                    <div className="h-1.5 w-4 rounded-full bg-primary-orange/50" title="Hook"></div>
                    <div className="h-1.5 w-4 rounded-full bg-bright-blue/50" title="Bridge"></div>
                    <div className="h-1.5 w-4 rounded-full bg-fresh-green/50" title="Value"></div>

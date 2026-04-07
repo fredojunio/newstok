@@ -67,8 +67,13 @@ ${scrapeData.content.substring(0, 15000)}`;
         let puterModel = 'gpt-4o';
         if (model === 'puter-qwen') puterModel = 'qwen/qwen3.6-plus:free';
         if (model === 'puter-claude') puterModel = 'anthropic/claude-sonnet-4-6';
+        if (model === 'puter-claude-3.5-sonnet') puterModel = 'claude-3.5-sonnet';
+        if (model === 'puter-claude-3.5-opus') puterModel = 'claude-3.5-opus';
         if (model === 'puter-gemini') puterModel = 'google/gemini-3.1-pro-preview';
         if (model === 'puter-deepseek') puterModel = 'deepseek/deepseek-v3.2';
+        if (model === 'puter-llama-4') puterModel = 'llama-4-70b';
+        if (model === 'puter-mistral') puterModel = 'mistral-large-latest';
+        if (model === 'puter-grok') puterModel = 'grok-4.20';
 
         const response: any = await puter.ai.chat(prompt, { model: puterModel });
         let responseText = typeof response === 'string' ? response : (response?.message?.content || response?.text || JSON.stringify(response));
@@ -193,8 +198,13 @@ ${scrapeData.content.substring(0, 15000)}`;
                   <option value="puter-gpt-4o">Puter: GPT-4o (Free)</option>
                   <option value="puter-qwen">Puter: Qwen 3.6 (Free)</option>
                   <option value="puter-claude">Puter: Claude 4.6 (Free)</option>
+                  <option value="puter-claude-3.5-sonnet">Puter: Claude 3.5 Sonnet (Free)</option>
+                  <option value="puter-claude-3.5-opus">Puter: Claude 3.5 Opus (Free)</option>
                   <option value="puter-gemini">Puter: Gemini 3.1 (Free)</option>
                   <option value="puter-deepseek">Puter: DeepSeek V3.2 (Free)</option>
+                  <option value="puter-llama-4">Puter: Llama 4 70B (Free)</option>
+                  <option value="puter-mistral">Puter: Mistral Large (Free)</option>
+                  <option value="puter-grok">Puter: Grok 4.20 (Free)</option>
                 </select>
               </div>
 
